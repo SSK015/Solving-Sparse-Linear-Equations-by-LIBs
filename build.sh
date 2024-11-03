@@ -1,0 +1,1 @@
+mpicxx solve.cpp   -o  solve -lm -lgcc  -fopenmp -L/home/xiayanwen/software/hypre/src/lib/libHYPRE.a -I/home/xiayanwen/software/hypre/src/hypre/include
