@@ -9,6 +9,7 @@ num_process = 0
 path_prefix = "./data/small/"
 
 A = PETSc.Mat()
+A.create(PETSc.COMM_WORLD)
 global_rows = global_cols = 0
 
 def read_binary_file_pre(file_name):
