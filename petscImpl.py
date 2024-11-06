@@ -109,10 +109,19 @@ if rank == 0:
     absolute_path_b = os.path.abspath(relative_path_b)
     read_binary_right_vec(absolute_path_b, b)
 
+# relative_path_b = path_prefix + path_suffix_b
+# absolute_path_b = os.path.abspath(relative_path_b)
+# read_binary_right_vec(absolute_path_b, b)
+
 b.assemblyBegin()
 b.assemblyEnd()
 
+if rank == 0:
+    ksp.setMonitor(lambda ksp, it, rnorm: print(f"Iter {it}: Residual norm = {rnorm}"))
+
 ksp.setOperators(A)
+tol = 1e-6
+ksp.setTolerances(rtol=tol, max_it=1000000)
 ksp.setFromOptions()
 ksp.solve(b, x)
 
@@ -125,4 +134,8 @@ r.axpy(1.0, b)  # r = b - Ax
 
 residual_norm = r.norm()
 
-print(":", residual_norm)
+# print(":", residual_norm)
+
+# if rank == 0:
+#     for iii in range(300):
+#         print(x[iii])
