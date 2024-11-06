@@ -7,6 +7,8 @@ import struct
 num_files = 4
 num_process = 0
 path_prefix = "./data/small/"
+path_suffix_a = "A_coo_bin."
+path_suffix_b = "b_bin"
 
 A = PETSc.Mat()
 A.create(PETSc.COMM_WORLD)
@@ -37,10 +39,20 @@ def read_binary_file(file_name):
             A[II, JI] = Val
     return global_num_rows, global_num_cols, num_rows, num_cols, num_nonzeros
 
+def read_binary_right_vec(file_name, vec_b):
+    with open(file_name, 'rb') as f:
+        vec_size = struct.unpack('i', f.read(4))[0]  
+        print(vec_size)
+        for i in range(vec_size):
+            Val = struct.unpack('d', f.read(8))[0]
+            vec_b[i] = Val
+            # print(Val)
+    return vec_size
 
-relative_path = './data/small/' + "A_coo_bin.0"
-absolute_path = os.path.abspath(relative_path)
-global_cols, global_rows, _, _, _ =  read_binary_file_pre(absolute_path)
+
+relative_path_a0 = './data/small/' + "A_coo_bin.0"
+absolute_path_a0 = os.path.abspath(relative_path_a0)
+global_cols, global_rows, _, _, _ =  read_binary_file_pre(absolute_path_a0)
 
 A.setSizes([global_cols, global_rows])
 A.setType('aij') # sparse
@@ -70,9 +82,9 @@ num_process = size
 
 tasks = distribute_tasks(num_files)
 for item in tasks:
-    relative_path = path_prefix + "A_coo_bin." + str(item)
-    absolute_path = os.path.abspath(relative_path)
-    read_binary_file(absolute_path)
+    relative_path_a = path_prefix + path_suffix_a + str(item)
+    absolute_path_a = os.path.abspath(relative_path_a)
+    read_binary_file(absolute_path_a)
 # print(tasks)
 
 A.assemblyBegin()
@@ -89,7 +101,25 @@ ksp.setType('bcgs')
 # obtain sol & rhs vectors
 x, b = A.getVecs()
 x.set(0)
-b.set(1)
+print(b.size)
+# b.set(1)
+
+# relative_path_b = path_prefix + path_suffix_b
+# absolute_path_b = os.path.abspath(relative_path_b)
+# viewer = PETSc.Viewer().createBinary(absolute_path_b, PETSc.Viewer.Mode.R, comm=PETSc.COMM_WORLD)
+
+# b = PETSc.Vec().load(viewer)
+
+
+# if rank == 0:
+relative_path_b = path_prefix + path_suffix_b
+absolute_path_b = os.path.abspath(relative_path_b)
+read_binary_right_vec(absolute_path_b, b)
+
+b.assemblyBegin()
+b.assemblyEnd()
+    
+
 
 ksp.setOperators(A)
 ksp.setFromOptions()

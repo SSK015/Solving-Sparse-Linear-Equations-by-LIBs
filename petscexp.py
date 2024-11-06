@@ -5,7 +5,7 @@ from petsc4py import PETSc
 
 petsc4py.init(sys.argv)
 
-m, n  = 1024, 1024
+m, n  = 32, 32
 hx = 1.0/(m-1)
 hy = 1.0/(n-1)
 
