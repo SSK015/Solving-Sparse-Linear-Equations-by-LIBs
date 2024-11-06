@@ -42,7 +42,6 @@ def read_binary_file(file_name):
 def read_binary_right_vec(file_name, vec_b):
     with open(file_name, 'rb') as f:
         vec_size = struct.unpack('i', f.read(4))[0]  
-        print(vec_size)
         for i in range(vec_size):
             Val = struct.unpack('d', f.read(8))[0]
             vec_b[i] = Val
@@ -101,25 +100,17 @@ ksp.setType('bcgs')
 # obtain sol & rhs vectors
 x, b = A.getVecs()
 x.set(0)
-print(b.size)
+# print(b.size)
 # b.set(1)
 
-# relative_path_b = path_prefix + path_suffix_b
-# absolute_path_b = os.path.abspath(relative_path_b)
-# viewer = PETSc.Viewer().createBinary(absolute_path_b, PETSc.Viewer.Mode.R, comm=PETSc.COMM_WORLD)
 
-# b = PETSc.Vec().load(viewer)
-
-
-# if rank == 0:
-relative_path_b = path_prefix + path_suffix_b
-absolute_path_b = os.path.abspath(relative_path_b)
-read_binary_right_vec(absolute_path_b, b)
+if rank == 0:
+    relative_path_b = path_prefix + path_suffix_b
+    absolute_path_b = os.path.abspath(relative_path_b)
+    read_binary_right_vec(absolute_path_b, b)
 
 b.assemblyBegin()
 b.assemblyEnd()
-    
-
 
 ksp.setOperators(A)
 ksp.setFromOptions()
