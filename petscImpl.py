@@ -95,6 +95,9 @@ ksp = PETSc.KSP()
 ksp.create(PETSc.COMM_WORLD)
 
 ksp.setType('bcgs')
+
+pc = ksp.getPC()
+pc.setType('none')
 # ksp.getPC().setType('icc')
 
 # obtain sol & rhs vectors
